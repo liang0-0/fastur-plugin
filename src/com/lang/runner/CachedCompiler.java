@@ -127,7 +127,7 @@ public class CachedCompiler implements Closeable {
         synchronized (loadedClassesMap) {
             loadedClasses = loadedClassesMap.get(classLoader);
             if (loadedClasses == null)
-                loadedClassesMap.put(classLoader, loadedClasses = new LinkedHashMap<String, Class>());
+                loadedClassesMap.put(classLoader, loadedClasses = new LinkedHashMap<>());
             else
                 clazz = loadedClasses.get(className);
         }

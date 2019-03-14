@@ -1,5 +1,5 @@
 <idea-plugin>
-  <id>com.lang</id>
+  <id>com.lang.fastur.plugin</id>
   <name>fastur-plugin</name>
   <version>1.0</version>
   <vendor email="guoliang0_0@163.com" url="http://www.lang.com">guoliang</vendor>

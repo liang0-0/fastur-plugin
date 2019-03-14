@@ -1,14 +1,25 @@
 package com.lang.runner;
 
 import java.io.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MyClassLoader extends ClassLoader {
+    /**
+     * key is loaded classes, value is last loaded timestamp
+     */
+    private static final Map<Class, Long> loadedClassMap = new HashMap<>();
+    /**
+     * where to find class when load classes
+     */
+    private List<String> classpaths;
+    private ClassLoader parentClassLoader;
 
-    private String path;   //类的加载路径
-
-    public MyClassLoader(String path, ClassLoader parent) {
-        super(parent);
-        this.path = path;
+    public MyClassLoader(List<String> classpaths, ClassLoader parentClassLoader) {
+        this.classpaths = classpaths;
+        this.parentClassLoader = parentClassLoader;
     }
 
 
@@ -29,14 +40,14 @@ public class MyClassLoader extends ClassLoader {
 
     //用于加载类文件
     private byte[] loadClassData(String name) {
-
-        name = path + name + ".class";
+        // TODO: 2019/3/15 analysis classpaths, recursive file class file
+        name = classpaths + name + ".class";
         //使用输入流读取类文件
         InputStream in = null;
         //使用byteArrayOutputStream保存类文件。然后转化为byte数组
         ByteArrayOutputStream out = null;
         try {
-            in = new FileInputStream(new File(name));
+            in = new FileInputStream(new File(new URI(name)));
             out = new ByteArrayOutputStream();
             int i = 0;
             while ((i = in.read()) != -1) {
@@ -44,10 +55,15 @@ public class MyClassLoader extends ClassLoader {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
-                out.close();
-                in.close();
+                if (null != out) {
+                    out.close();
+                }
+                if (null != in) {
+                    in.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
