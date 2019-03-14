@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Unnamed" pattern="com.intellij..*||com.intellij.css..*||com.intellij.database..*||com.intellij.debugger..*||com.intellij.javaee..*||com.intellij.lang..*||com.intellij.persistence..*||com.intellij.reactor..*||com.intellij.util.*||com.intellij.testFramework.*" />
+</component>

@@ -1,0 +1,31 @@
+<idea-plugin>
+  <id>com.lang</id>
+  <name>fastur-plugin</name>
+  <version>1.0</version>
+  <vendor email="guoliang0_0@163.com" url="http://www.lang.com">guoliang</vendor>
+
+  <description></description>
+
+  <change-notes></change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <action id="com.lang.action.RunJavaAction" class="com.lang.action.RunJavaAction" text="Run Your Java" description="右键, 直接执行你的java代码">
+      <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="EditorPopupMenu1"/>
+    </action>
+  </actions>
+
+</idea-plugin>
