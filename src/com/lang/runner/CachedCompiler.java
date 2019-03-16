@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 import java.io.Closeable;
 import java.io.File;
@@ -39,8 +38,9 @@ public class CachedCompiler implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(CachedCompiler.class);
     private static final PrintWriter DEFAULT_WRITER = new PrintWriter(System.err);
 
-    private final Map<ClassLoader, Map<String, Class>> loadedClassesMap = Collections.synchronizedMap(new WeakHashMap<ClassLoader, Map<String, Class>>());
-    private final Map<ClassLoader, MyJavaFileManager> fileManagerMap = Collections.synchronizedMap(new WeakHashMap<ClassLoader, MyJavaFileManager>());
+    private final Map<ClassLoader, Map<String, Class>> loadedClassesMap = Collections.synchronizedMap(
+        new WeakHashMap<>());
+    private final Map<ClassLoader, MyJavaFileManager> fileManagerMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     @Nullable
     private final File sourceDir;
@@ -48,7 +48,7 @@ public class CachedCompiler implements Closeable {
     private final File classDir;
 
     private final Map<String, JavaFileObject> javaFileObjects =
-            new HashMap<String, JavaFileObject>();
+        new HashMap<>();
 
     public CachedCompiler(@Nullable File sourceDir, @Nullable File classDir) {
         this.sourceDir = sourceDir;
@@ -91,19 +91,14 @@ public class CachedCompiler implements Closeable {
             File file = new File(sourceDir, filename);
             writeText(file, javaCode);
             compilationUnits = s_standardJavaFileManager.getJavaFileObjects(file);
-            System.out.println("file.getAbsolutePath() = " + file.getAbsolutePath());
         } else {
             javaFileObjects.put(className, new JavaSourceFromString(className, javaCode));
             compilationUnits = javaFileObjects.values();
-            System.out.println("className = " + className);
         }
         // reuse the same file manager to allow caching of jar files
-        boolean ok = s_compiler.getTask(writer, fileManager, new DiagnosticListener<JavaFileObject>() {
-            @Override
-            public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-                if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
-                    writer.println(diagnostic);
-                }
+        boolean ok = s_compiler.getTask(writer, fileManager, diagnostic -> {
+            if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
+                writer.println(diagnostic);
             }
         }, null, null, compilationUnits).call();
         Map<String, byte[]> result = fileManager.getAllBuffers();
@@ -139,7 +134,6 @@ public class CachedCompiler implements Closeable {
         if (fileManager == null) {
             s_standardJavaFileManager = s_compiler.getStandardFileManager(null, null, null);
             fileManagerMap.put(classLoader, fileManager = new MyJavaFileManager(s_standardJavaFileManager));
-            System.out.println("s_standardJavaFileManager = " + s_standardJavaFileManager);
         }
         for (Map.Entry<String, byte[]> entry : compileFromJava(className, javaCode, printWriter, fileManager).entrySet()) {
             String className2 = entry.getKey();
@@ -161,7 +155,10 @@ public class CachedCompiler implements Closeable {
             }
         }
         synchronized (loadedClassesMap) {
-            loadedClasses.put(className, clazz = classLoader.loadClass(className));
+            Class<?> loadClass = classLoader.loadClass(className);
+            if (null != loadClass) {
+                loadedClasses.put(className, clazz = loadClass);
+            }
         }
         return clazz;
     }

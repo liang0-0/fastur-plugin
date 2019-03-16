@@ -18,23 +18,31 @@
 
 package com.lang.runner;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.misc.Unsafe;
-
-import javax.tools.JavaCompiler;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import javax.tools.JavaCompiler;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class support loading and debugging Java Classes dynamically.
@@ -52,14 +60,8 @@ public enum CompilerUtils {
 
     static {
         try {
-            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            Unsafe u = (Unsafe) theUnsafe.get(null);
             DEFINE_CLASS_METHOD = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-            Field f = AccessibleObject.class.getDeclaredField("override");
-            long offset = u.objectFieldOffset(f);
-            u.putBoolean(DEFINE_CLASS_METHOD, offset, true);
-        } catch (NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (NoSuchMethodException e) {
             throw new AssertionError(e);
         }
     }
