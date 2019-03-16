@@ -16,6 +16,6 @@
  - Editor editor: 当前的编辑器对象
  - String filepath: 当前文件的全路径
  - String filename: 当前运行的文件名称, 带有后缀
- - <任意类型> <任意名称>: 其他类型, 默认为nul,
+ - <任意类型> <任意名称>: 其他类型, 默认为null
  
 **注意,不能设置原始类型, 如int, float等, 否则直接报错**
